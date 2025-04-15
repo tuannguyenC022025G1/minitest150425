@@ -3,51 +3,68 @@ package company;
 import java.util.*;
 
 public class Company {
-    private List<Employee> employeeList = new ArrayList<>();
+    private Employee[] employeeList;
+    private int count;
+    private int maxEmployee;
+
+    public Company(int maxEmployee) {
+        this.maxEmployee = maxEmployee;
+        employeeList = new Employee[maxEmployee];
+        count = 0;
+    }
 
     public void addEmployee(Employee e) {
-        employeeList.add(e);
+        if (count < maxEmployee) {
+            employeeList[count] = e;
+            count++;
+        } else {
+            System.out.println("Danh sách nhân viên đã đầy!");
+        }
     }
 
     public double averageSalary() {
+        if (count == 0) return 0;
         double total = 0;
-        for (Employee e : employeeList) {
-            total += e.calculateSalary();
+        for (int i = 0; i < count; i++) {
+            total += employeeList[i].calculateSalary();
         }
-        return employeeList.size() > 0 ? total / employeeList.size() : 0;
+        return total / count;
     }
 
     public void listFulltimeBelowAverage() {
         double avg = averageSalary();
-        System.out.println("\n Full-time employees with salary below average:");
-        for (Employee e : employeeList) {
-            if (e instanceof FulltimeEmployee && e.calculateSalary() < avg) {
-                System.out.println(e.getName() + " - Salary: " + e.calculateSalary());
+        System.out.println("\nFull-time employees with salary below average:");
+        for (int i = 0; i < count; i++) {
+            if (employeeList[i] instanceof FulltimeEmployee && employeeList[i].calculateSalary() < avg) {
+                System.out.println(employeeList[i].getName() + " - Salary: " + employeeList[i].calculateSalary());
             }
         }
     }
 
     public double totalParttimeSalary() {
         double total = 0;
-        for (Employee e : employeeList) {
-            if (e instanceof ParttimeEmployee) {
-                total += e.calculateSalary();
+        for (int i = 0; i < count; i++) {
+            if (employeeList[i] instanceof ParttimeEmployee) {
+                total += employeeList[i].calculateSalary();
             }
         }
         return total;
     }
 
     public void sortFulltimeBySalary() {
-        List<FulltimeEmployee> fulltimes = new ArrayList<>();
-        for (Employee e : employeeList) {
-            if (e instanceof FulltimeEmployee) {
-                fulltimes.add((FulltimeEmployee) e);
+        FulltimeEmployee[] fulltimes = new FulltimeEmployee[count];
+        int ftCount = 0;
+        for (int i = 0; i < count; i++) {
+            if (employeeList[i] instanceof FulltimeEmployee) {
+                fulltimes[ftCount++] = (FulltimeEmployee) employeeList[i];
             }
         }
-        fulltimes.sort(Comparator.comparingDouble(FulltimeEmployee::getSalary));
+
+        Arrays.sort(fulltimes, 0, ftCount, Comparator.comparingDouble(FulltimeEmployee::getSalary));
+
         System.out.println("\n📋 Full-time employees sorted by salary:");
-        for (FulltimeEmployee e : fulltimes) {
-            System.out.println(e);
+        for (int i = 0; i < ftCount; i++) {
+            System.out.println(fulltimes[i]);
         }
     }
 
@@ -71,7 +88,7 @@ public class Company {
 
             switch (choice) {
                 case 1:
-                    System.out.println("\n Average salary: " + averageSalary());
+                    System.out.println("\nAverage salary: " + averageSalary());
                     break;
                 case 2:
                     listFulltimeBelowAverage();
@@ -86,17 +103,17 @@ public class Company {
                     System.out.println("\nExiting program...");
                     break;
                 default:
-                    System.out.println(" Invalid option. Try again.");
+                    System.out.println("Invalid option. Try again.");
             }
         } while (choice != 5);
     }
 
     public static void main(String[] args) {
-        Company company = new Company();
+        Company company = new Company(10);
 
         company.addEmployee(new FulltimeEmployee("FT01", "Barrack Obama", 30, "0123456789", "Oimeoi@example.com", 1000000, 500000, 5000000));
         company.addEmployee(new FulltimeEmployee("FT02", "Joe Biden", 32, "0987654321", "trungtam@example.com", 500000, 200000, 4500000));
-        company.addEmployee(new ParttimeEmployee("PT01", "Donal TRump", 34, "0111222333", "cogaixinh@example.com", 40));
+        company.addEmployee(new ParttimeEmployee("PT01", "Donal Trump", 34, "0111222333", "cogaixinh@example.com", 40));
         company.addEmployee(new ParttimeEmployee("PT02", "George Bush", 36, "0444555666", "xinhlamluon@example.com", 35));
 
         company.showMenu();
